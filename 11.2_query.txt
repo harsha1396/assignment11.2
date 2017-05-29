@@ -1,0 +1,26 @@
+1)Create table realEstate in Hive database, with all the columns present in dataset.Also Load dataset into table realEstate.
+
+CREATING NON-PARTITIONED TABLE:
+CREATE TABLE IF NOT EXISTS real_estate(street string,city string,zip bigint,state string,beds int,baths int, sq_ft int,type string,sale_date string,price bigint,latitude float,longitude float)                         
+ROW FORMAT DELIMITED
+FIELDS TERMINATED BY ','
+STORED AS TEXTFILE;
+
+LOADING DATA:
+LOAD DATA LOCAL INPATH '/home/acadgild/Downloads/real_estate.csv' OVERWRITE INTO TABLE real_estate;
+
+2)Using Dynamic partition give separate lists of residential apartments with more than 2 beds. Also include columns in following order
+City,Baths,Sq_feet,Price,flat_type,Beds respectively.
+
+CREATING TABLE:
+CREATE TABLE IF NOT EXISTS partition_real_estate(city string,baths int,sq_ft int,price bigint,type string)
+PARTITIONED BY (beds int)
+ROW FORMAT DELIMITED
+FIELDS TERMINATED BY ','
+STORED AS TEXTFILE;
+    
+INSERTING INTO TABLE:
+INSERT OVERWRITE TABLE partition_real_estate PARTITION(beds) SELECT city,baths,sq_ft,price,type,beds FROM real_estate where beds>2;
+
+DISPLAYING TABLE:
+SELECT * FROM partition_real_estate;
